@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.Pane?>
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.gui.MainScreenController">
+   <children>
+      <Button layoutX="264.0" layoutY="300.0" mnemonicParsing="false" onAction="#onScrapButtonClick" text="Transcribir" />
+      <TextField fx:id="txtUrlPagina" layoutX="226.0" layoutY="175.0" />
+      <Label layoutX="226.0" layoutY="137.0" text="Inserte el url para realizar Scraping" />
+   </children>
+</Pane>
+
