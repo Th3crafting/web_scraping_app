@@ -1,6 +1,7 @@
 package com.gui;
 
 import com.utilities.ConexionPagina;
+import com.utilities.ElempleoScraper;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -62,7 +63,8 @@ public class MainScreenController {
                 if (finalSelectedCheckBox == checkCompuTrabajo) {
                     System.out.println("Computrabajo");
                 } else if (finalSelectedCheckBox == checkElEmpleo) {
-                    System.out.println("Elempleo");
+                    ElempleoScraper WebScraper = new ElempleoScraper();
+                    WebScraper.scrape(urlEnUso);
                 } else if (finalSelectedCheckBox == checkLinkedIn) {
                     System.out.println("LinkedIn");
                 } else if (finalSelectedCheckBox == checkTest) {
