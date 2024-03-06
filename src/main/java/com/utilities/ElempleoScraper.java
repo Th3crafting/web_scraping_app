@@ -1,12 +1,17 @@
 package com.utilities;
 
+import com.opencsv.CSVWriter;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -28,6 +33,16 @@ public class ElempleoScraper {
     public void scrape(String url) {
         try {
             driver.get(url);
+
+            Date fechaActual = new Date();
+            SimpleDateFormat formato = new SimpleDateFormat("dd-mm-yyyy - HH-mm");
+            String fechaFormateada = formato.format(fechaActual);
+
+            File archivoCSV = new File("ElempleoScrap - " + fechaFormateada + ".csv");
+            FileWriter fileWriter = new FileWriter(archivoCSV);
+            CSVWriter csvWriter = new CSVWriter(fileWriter, ';', CSVWriter.DEFAULT_QUOTE_CHARACTER, CSVWriter.DEFAULT_ESCAPE_CHARACTER, CSVWriter.DEFAULT_LINE_END);
+
+            csvWriter.writeNext(new String[]{"tituloOferta", "empresa", "salario", "lugar", "fecha", "descripcion1", "descripcion2", "cargosRelacionados"});
 
             int posicion = 1;
 
@@ -60,7 +75,7 @@ public class ElempleoScraper {
                             WebElement salarioElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//div[@class='media-body media-middle']//span[@class='text-primary']")));
                             WebElement lugarElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//div[@class='data-offer-wrapper']//span[@class='info-city']")));
                             WebElement fechaElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//div[@class='data-offer-wrapper']//span[@class='pull-right info-publish-date']")));
-                            WebElement descripElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//p[@class='js-description']")));
+                            WebElement descripElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//p[@class='js-description' and @title]")));
                             WebElement cargosRelacionadosElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//div[@class='ee-modal-equivalent-position']//span")));
 
                             String tituloOferta = tituloOfertaElement.getText().trim();
@@ -72,9 +87,8 @@ public class ElempleoScraper {
                             String descripcion2 = descripElement.getAttribute("title").trim();
                             String cargosRelacionados = cargosRelacionadosElement.getText().trim();
 
-                            String lineaOferta = String.format("%s;%s;%s;%s;%s;%s;%s;%s", tituloOferta, empresa, salario, lugar, fecha, descripcion1, descripcion2, cargosRelacionados);
-
-                            System.out.println(lineaOferta);
+                            String[] lineaOferta = new String[]{tituloOferta, empresa, salario, lugar, fecha, descripcion1, descripcion2, cargosRelacionados};
+                            csvWriter.writeNext(lineaOferta);
 
                             break;
                         } catch (StaleElementReferenceException e){
@@ -113,4 +127,3 @@ public class ElempleoScraper {
         }
     }
 }
-
