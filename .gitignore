@@ -36,3 +36,6 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+### Externals ###
+/ElempleoScrap - 06-09-2024 - 17-09.csv
