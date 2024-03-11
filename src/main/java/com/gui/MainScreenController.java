@@ -4,11 +4,12 @@ import com.utilities.ConexionPagina;
 import com.utilities.ElempleoScraper;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 
 public class MainScreenController {
+    @FXML
+    private Button buttonScrap;
+
     @FXML
     private TextField txtUrlPagina;
 
@@ -26,6 +27,9 @@ public class MainScreenController {
 
     @FXML
     private RadioButton checkTest;
+
+    @FXML
+    private ProgressBar progressBar;
 
     @FXML
     protected void onScrapButtonClick(){
@@ -83,9 +87,25 @@ public class MainScreenController {
 
     private void onScrapingStarted() {
         txtStatus.setText("Realizando scraping...");
+        Platform.runLater(() -> {
+            progressBar.setProgress(0.0);
+            txtUrlPagina.setDisable(true);
+            checkTest.setDisable(true);
+            checkLinkedIn.setDisable(true);
+            checkElEmpleo.setDisable(true);
+            checkCompuTrabajo.setDisable(true);
+            buttonScrap.setDisable(true);
+        });
     }
 
     private void onScrapingFinished() {
         txtStatus.setText("Scraping completo.");
+        Platform.runLater(() -> progressBar.setProgress(1.0));
+        txtUrlPagina.setDisable(false);
+        checkTest.setDisable(false);
+        checkLinkedIn.setDisable(false);
+        checkElEmpleo.setDisable(false);
+        checkCompuTrabajo.setDisable(false);
+        buttonScrap.setDisable(false);
     }
 }
