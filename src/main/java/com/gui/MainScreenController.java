@@ -7,6 +7,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
 public class MainScreenController {
+    private ElempleoScraper webScraper;
+
     @FXML
     private Button buttonScrap;
 
@@ -30,6 +32,10 @@ public class MainScreenController {
 
     @FXML
     private ProgressBar progressBar;
+
+    public MainScreenController() {
+        webScraper = new ElempleoScraper(progressBar);
+    }
 
     @FXML
     protected void onScrapButtonClick(){
@@ -57,6 +63,7 @@ public class MainScreenController {
             String urlEnUso = txtUrlPagina.getText();
 
             txtStatus.setText("Realizando scraping...");
+
             Platform.runLater(() -> {
                 onScrapingStarted();
             });
@@ -67,7 +74,7 @@ public class MainScreenController {
                 if (finalSelectedCheckBox == checkCompuTrabajo) {
                     System.out.println("Computrabajo");
                 } else if (finalSelectedCheckBox == checkElEmpleo) {
-                    ElempleoScraper WebScraper = new ElempleoScraper();
+                    ElempleoScraper WebScraper = new ElempleoScraper(progressBar);
                     WebScraper.scrape(urlEnUso);
                 } else if (finalSelectedCheckBox == checkLinkedIn) {
                     System.out.println("LinkedIn");
@@ -88,7 +95,7 @@ public class MainScreenController {
     private void onScrapingStarted() {
         txtStatus.setText("Realizando scraping...");
         Platform.runLater(() -> {
-            progressBar.setProgress(0.0);
+            webScraper.setProgressBar(progressBar);
             txtUrlPagina.setDisable(true);
             checkTest.setDisable(true);
             checkLinkedIn.setDisable(true);
@@ -100,12 +107,14 @@ public class MainScreenController {
 
     private void onScrapingFinished() {
         txtStatus.setText("Scraping completo.");
-        Platform.runLater(() -> progressBar.setProgress(1.0));
-        txtUrlPagina.setDisable(false);
-        checkTest.setDisable(false);
-        checkLinkedIn.setDisable(false);
-        checkElEmpleo.setDisable(false);
-        checkCompuTrabajo.setDisable(false);
-        buttonScrap.setDisable(false);
+        Platform.runLater(() -> {
+            progressBar.setProgress(1.0);
+            txtUrlPagina.setDisable(false);
+            checkTest.setDisable(false);
+            checkLinkedIn.setDisable(false);
+            checkElEmpleo.setDisable(false);
+            checkCompuTrabajo.setDisable(false);
+            buttonScrap.setDisable(false);
+        });
     }
 }
