@@ -1,0 +1,37 @@
+Manifest-Version: 1.0
+Main-Class: com.mainclass.MainStarter
+Class-Path: selenium-devtools-v121-4.18.1.jar opentelemetry-semconv-1.23
+ .1-alpha.jar tilesfx-11.48.jar javafx-fxml-21-win.jar javafx-web-21.jar
+  jackson-core-2.14.2.jar selenium-chrome-driver-4.18.1.jar jackson-anno
+ tations-2.14.2.jar opentelemetry-context-1.35.0.jar opentelemetry-api-e
+ vents-1.35.0-alpha.jar fxgl-io-17.3.jar selenium-devtools-v85-4.18.1.ja
+ r javafx-media-21.jar auto-service-annotations-1.1.1.jar jsr305-3.0.2.j
+ ar javafx-graphics-21-win.jar selenium-http-4.18.1.jar javafx-graphics-
+ 21.jar javafx-controls-21.jar failsafe-3.3.2.jar commons-exec-1.3.jar j
+ avafx-controls-21-win.jar kotlin-stdlib-1.8.10.jar selenium-support-4.1
+ 8.1.jar jsoup-1.17.2.jar opentelemetry-extension-incubator-1.35.0-alpha
+ .jar selenium-java-4.18.1.jar opentelemetry-sdk-extension-autoconfigure
+ -1.35.0.jar opentelemetry-sdk-extension-autoconfigure-spi-1.35.0.jar ja
+ vafx-swing-21.jar kotlin-stdlib-common-1.8.10.jar commons-lang3-3.13.0.
+ jar fxgl-core-17.3.jar bootstrapfx-core-0.4.0.jar fxgl-entity-17.3.jar 
+ selenium-devtools-v122-4.18.1.jar opentelemetry-sdk-common-1.35.0.jar s
+ elenium-remote-driver-4.18.1.jar error_prone_annotations-2.23.0.jar com
+ mons-beanutils-1.9.4.jar storage-4.0.17.jar selenium-manager-4.18.1.jar
+  javafx-swing-21-win.jar opentelemetry-sdk-1.35.0.jar selenium-safari-d
+ river-4.18.1.jar formsfx-core-11.6.0.jar audio-4.0.17.jar failureaccess
+ -1.0.2.jar ikonli-javafx-12.3.1.jar opentelemetry-sdk-logs-1.35.0.jar j
+ avafx-media-21-win.jar controlsfx-11.1.2.jar opentelemetry-sdk-trace-1.
+ 35.0.jar byte-buddy-1.14.12.jar j2objc-annotations-2.8.jar opentelemetr
+ y-exporter-logging-1.35.0.jar javafx-base-21.jar selenium-ie-driver-4.1
+ 8.1.jar fxgl-gameplay-17.3.jar commons-collections-3.2.2.jar commons-lo
+ gging-1.2.jar commons-collections4-4.4.jar javafx-web-21-win.jar seleni
+ um-json-4.18.1.jar checker-qual-3.41.0.jar selenium-firefox-driver-4.18
+ .1.jar selenium-edge-driver-4.18.1.jar listenablefuture-9999.0-empty-to
+ -avoid-conflict-with-guava.jar fxgl-scene-17.3.jar jackson-databind-2.1
+ 4.2.jar selenium-devtools-v120-4.18.1.jar javafx-fxml-21.jar ikonli-cor
+ e-12.3.1.jar selenium-chromium-driver-4.18.1.jar fxgl-17.3.jar javafx-b
+ ase-21-win.jar selenium-api-4.18.1.jar guava-33.0.0-jre.jar opencsv-5.9
+ .jar selenium-os-4.18.1.jar opentelemetry-sdk-metrics-1.35.0.jar valida
+ torfx-0.4.0.jar commons-text-1.11.0.jar util-4.0.17.jar opentelemetry-a
+ pi-1.35.0.jar lifecycle-4.0.17.jar annotations-13.0.jar
+

@@ -1,16 +1,22 @@
 package com.gui;
 
+import com.utilities.ComputrabajoScraper;
 import com.utilities.ConexionPagina;
 import com.utilities.ElempleoScraper;
+import com.utilities.LinkedInScraper;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import org.jetbrains.annotations.Nullable;
 
 public class MainScreenController {
-    private ElempleoScraper webScraper;
+    private final ElempleoScraper webScraper;
 
     @FXML
     private Button buttonScrap;
+
+    @FXML
+    private Button buttonCancel;
 
     @FXML
     private TextField txtUrlPagina;
@@ -33,14 +39,99 @@ public class MainScreenController {
     @FXML
     private ProgressBar progressBar;
 
+    private ElempleoScraper elempleoScraper;
+    private ComputrabajoScraper computrabajoScraper;
+    private LinkedInScraper linkedInScraper;
+    private ConexionPagina conexionPagina;
+
+
     public MainScreenController() {
         webScraper = new ElempleoScraper(progressBar);
     }
 
     @FXML
     protected void onScrapButtonClick(){
-        int numSelected = 0;
+        RadioButton selectedCheckBox;
+        if ((selectedCheckBox = checkSelectedCount()) != null) {
+            String urlEnUso = txtUrlPagina.getText();
+
+            txtStatus.setText("Realizando scraping...");
+
+            Platform.runLater(this::onScrapingStarted);
+
+            new Thread(() -> {
+                if (selectedCheckBox == checkCompuTrabajo) {
+                    System.out.println("Computrabajo");
+                } else if (selectedCheckBox == checkElEmpleo) {
+                    elempleoScraper = new ElempleoScraper(progressBar);
+                    elempleoScraper.scrape(urlEnUso);
+                } else if (selectedCheckBox == checkLinkedIn) {
+                    linkedInScraper = new LinkedInScraper(progressBar);
+                    linkedInScraper.scrape(urlEnUso);
+                } else if (selectedCheckBox == checkTest) {
+                    conexionPagina = new ConexionPagina();
+                    conexionPagina.scrape(urlEnUso);
+                }
+
+                Platform.runLater(this::onScrapingFinished);
+            }).start();
+        }
+    }
+
+    @FXML
+    protected void onCancelButtonClick () {
+        RadioButton selectedCheckBox;
+        if ((selectedCheckBox = checkSelectedCount()) != null) {
+            txtStatus.setText("Scraping cancelado.");
+
+            new Thread(() -> {
+                if (selectedCheckBox == checkCompuTrabajo) {
+                    System.out.println("Computrabajo");
+                } else if (selectedCheckBox == checkElEmpleo) {
+                    elempleoScraper.cancelScraper();
+                } else if (selectedCheckBox == checkLinkedIn) {
+                    linkedInScraper.cancelScraper();
+                } else if (selectedCheckBox == checkTest) {
+                    System.out.println("Cancelado.");
+                }
+
+                Platform.runLater(this::onScrapingFinished);
+            }).start();
+        }
+    }
+
+    private void onScrapingStarted() {
+        txtStatus.setText("Realizando scraping...");
+        Platform.runLater(() -> {
+            webScraper.setProgressBar(progressBar);
+            buttonCancel.setDisable(false);
+            txtUrlPagina.setDisable(true);
+            checkTest.setDisable(true);
+            checkLinkedIn.setDisable(true);
+            checkElEmpleo.setDisable(true);
+            checkCompuTrabajo.setDisable(true);
+            buttonScrap.setDisable(true);
+        });
+    }
+
+    private void onScrapingFinished() {
+        txtStatus.setText("Scraping completo.");
+        Platform.runLater(() -> {
+            progressBar.setProgress(1.0);
+            buttonCancel.setDisable(true);
+            txtUrlPagina.setDisable(false);
+            checkTest.setDisable(false);
+            checkLinkedIn.setDisable(false);
+            checkElEmpleo.setDisable(false);
+            checkCompuTrabajo.setDisable(false);
+            buttonScrap.setDisable(false);
+        });
+    }
+
+    @Nullable
+    private RadioButton checkSelectedCount () {
         RadioButton selectedCheckBox = null;
+        int numSelected = 0;
 
         if (checkCompuTrabajo.isSelected()){
             numSelected++;
@@ -60,61 +151,10 @@ public class MainScreenController {
         }
 
         if (numSelected == 1) {
-            String urlEnUso = txtUrlPagina.getText();
-
-            txtStatus.setText("Realizando scraping...");
-
-            Platform.runLater(() -> {
-                onScrapingStarted();
-            });
-
-            RadioButton finalSelectedCheckBox = selectedCheckBox;
-
-            new Thread(() -> {
-                if (finalSelectedCheckBox == checkCompuTrabajo) {
-                    System.out.println("Computrabajo");
-                } else if (finalSelectedCheckBox == checkElEmpleo) {
-                    ElempleoScraper WebScraper = new ElempleoScraper(progressBar);
-                    WebScraper.scrape(urlEnUso);
-                } else if (finalSelectedCheckBox == checkLinkedIn) {
-                    System.out.println("LinkedIn");
-                } else if (finalSelectedCheckBox == checkTest) {
-                    ConexionPagina WebScraper = new ConexionPagina();
-                    WebScraper.scrape(urlEnUso);
-                }
-
-                Platform.runLater(() -> {
-                    onScrapingFinished();
-                });
-            }).start();
+            return selectedCheckBox;
         }else {
             txtStatus.setText("Seleccione solo una página.");
+            return null;
         }
-    }
-
-    private void onScrapingStarted() {
-        txtStatus.setText("Realizando scraping...");
-        Platform.runLater(() -> {
-            webScraper.setProgressBar(progressBar);
-            txtUrlPagina.setDisable(true);
-            checkTest.setDisable(true);
-            checkLinkedIn.setDisable(true);
-            checkElEmpleo.setDisable(true);
-            checkCompuTrabajo.setDisable(true);
-            buttonScrap.setDisable(true);
-        });
-    }
-
-    private void onScrapingFinished() {
-        txtStatus.setText("Scraping completo.");
-        Platform.runLater(() -> {
-            progressBar.setProgress(1.0);
-            txtUrlPagina.setDisable(false);
-            checkTest.setDisable(false);
-            checkLinkedIn.setDisable(false);
-            checkElEmpleo.setDisable(false);
-            checkCompuTrabajo.setDisable(false);
-            buttonScrap.setDisable(false);
-        });
     }
 }

@@ -3,6 +3,7 @@ package com.utilities;
 import com.opencsv.CSVWriter;
 import javafx.application.Platform;
 import javafx.scene.control.ProgressBar;
+import org.jetbrains.annotations.NotNull;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -23,6 +24,8 @@ public class ElempleoScraper {
     private CSVWriter writer;
     private ProgressBar progressBar;
 
+    private volatile boolean cancelScraping = false;
+
     public ElempleoScraper(ProgressBar progressBar) {
         this.progressBar = progressBar;
         System.setProperty("webdriver.chrome.driver", "./chromedriver.exe");
@@ -32,9 +35,10 @@ public class ElempleoScraper {
         options.addArguments("--headless");
 
         driver = new ChromeDriver(options);
-        wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+        wait = new WebDriverWait(driver, Duration.ofSeconds(3));
     }
-    public void setProgressBar (ProgressBar progressBar) {
+
+    public void setProgressBar(ProgressBar progressBar) {
         this.progressBar = progressBar;
     }
 
@@ -56,14 +60,17 @@ public class ElempleoScraper {
             int pagina = 1;
 
             while (ofertasProcesadas <= cantTotalOffers) {
+                System.out.println("Página a scrapear: " + pagina);
                 ofertasProcesadas += startScrap(cantTotalOffers, pagina);
-                if ((ofertasProcesadas < (ofertasProcesadas + 20)) && (ofertasProcesadas + 20 < cantTotalOffers)) {
+                if (cancelScraping) {
+                    ofertasProcesadas = (cantTotalOffers + 1);
+                    break;
+                } else if ((ofertasProcesadas < (ofertasProcesadas + 20)) && (ofertasProcesadas + 20 < cantTotalOffers)) {
                     System.out.println(changePageIndex());
                     pagina++;
                 }
                 System.out.println("Ofertas totales procesadas: " + ofertasProcesadas);
             }
-
             writer.close();
             driver.quit();
         } catch (Exception e) {
@@ -74,17 +81,17 @@ public class ElempleoScraper {
         }
     }
 
-    private String navigateToPage (String url) {
+    @NotNull
+    private String navigateToPage(String url) {
         try {
             driver.get(url);
             return "Página encontrada";
         } catch (Exception e) {
-            System.out.println("Error url navegar pagina -> " + e.getMessage());
-            e.printStackTrace();
-            return "Error en la página";
+            return "Error al encontrar la página || " + e.getMessage();
         }
     }
 
+    @NotNull
     private String createArchive() throws IOException {
         Date fechaActual = new Date();
         SimpleDateFormat formato = new SimpleDateFormat("dd-MM-yyyy - HH-mm");
@@ -113,75 +120,84 @@ public class ElempleoScraper {
             int posicionAct = 1;
 
             for (WebElement btnAperturaInformacion : botonesDeAperturaInformacion) {
-                if (pagina == 1) {
-                    if (firstTime) {
-                        firstTime = checkFirstTime();
+                if (cancelScraping) {
+                    System.out.println("Scraping Cancelado por el usuario.");
+                    writer.close();
+                    driver.quit();
+                    break;
+                } else {
+                    if (pagina == 1) {
+                        if (firstTime) {
+                            firstTime = checkFirstTime();
+                        }
                     }
-                }
 
-                WebElement iconoBtnInfo = searchBtnInfoIcon(btnAperturaInformacion);
-                assert iconoBtnInfo != null;
-                iconoBtnInfo.click();
+                    WebElement iconoBtnInfo = searchBtnInfoIcon(btnAperturaInformacion);
+                    assert iconoBtnInfo != null;
+                    iconoBtnInfo.click();
 
-                int lecturas = 0;
+                    int lecturas = 0;
 
-                while (lecturas < 3) {
-                    try {
-                        Thread.sleep(500);
-                        String[] lineaOferta = getJobOffer();
-                        writer.writeNext(lineaOferta);
-                        break;
-                    } catch (StaleElementReferenceException e) {
-                        int numLecturas = lecturas + 1;
-                        System.out.println("Elemento no encontrado. Reintentando...(" + numLecturas + "/3)");
-                        lecturas++;
-                        Thread.sleep(250);
-                    } catch (Exception e) {
-                        System.out.println("Error -> " + e.getMessage());
+                    while (lecturas < 3) {
+                        try {
+                            Thread.sleep(500);
+                            String[] lineaOferta = getJobOffer();
+                            writer.writeNext(lineaOferta);
+                            break;
+                        } catch (StaleElementReferenceException e) {
+                            int numLecturas = lecturas + 1;
+                            System.out.println("Error busqueda datos. Reintentando...(" + numLecturas + "/3)");
+                            lecturas++;
+                            Thread.sleep(250);
+                        } catch (Exception e) {
+                            System.out.println("Error -> " + e.getMessage());
+                        }
                     }
-                }
 
-                int intentos = 0;
+                    int intentos = 0;
 
-                while (intentos < 3) {
-                    try {
-                        Thread.sleep(250);
-                        WebElement contenedorPadreCerrar = searchContenedorPadre();
-                        assert contenedorPadreCerrar != null;
-                        WebElement btnCerrar = wait.until(ExpectedConditions.elementToBeClickable(contenedorPadreCerrar.findElement(By.cssSelector("button.close"))));
-                        btnCerrar.click();
-                        break;
-                    } catch (StaleElementReferenceException e){
-                        int numIntentos = intentos + 1;
-                        System.out.println("Elemento no encontrado. Reintentando...(" + numIntentos + "/3)");
-                        intentos++;
-                        Thread.sleep(250);
+                    while (intentos < 3) {
+                        try {
+                            Thread.sleep(250);
+                            WebElement contenedorPadreCerrar = searchContenedorPadre();
+                            assert contenedorPadreCerrar != null;
+                            WebElement btnCerrar = wait.until(ExpectedConditions.elementToBeClickable(contenedorPadreCerrar.findElement(By.cssSelector("button.close"))));
+                            btnCerrar.click();
+                            break;
+                        } catch (StaleElementReferenceException e) {
+                            int numIntentos = intentos + 1;
+                            System.out.println("Error busqueda boton cierre. Reintentando...(" + numIntentos + "/3)");
+                            intentos++;
+                            Thread.sleep(250);
+                        }
                     }
                 }
                 System.out.println("Ofertas transcritas: " + posicionAct);
                 updateProgressBar(posicionAct, cantTotalOfertas);
                 posicionAct++;
             }
-            Thread.sleep(10000);
+            Thread.sleep(8000);
             return posicionAct - 1;
         } catch (Exception e) {
-            return -1;
+            return 0;
         }
     }
 
+    @NotNull
     private String changePageIndex() {
         WebElement btnCambioPagina;
         try {
             btnCambioPagina = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//a[@class='js-btn-next']//i[@class='fa fa-angle-right']")));
             assert btnCambioPagina != null;
             btnCambioPagina.click();
-            Thread.sleep(5000);
+            Thread.sleep(2500);
             return "Cambio de Página exitoso";
-        } catch (Exception e){
+        } catch (Exception e) {
             return "Error al cambiar página || " + e.getMessage();
         }
     }
 
+    @NotNull
     private String[] getJobOffer() {
         WebElement tituloOfertaElement = getTitleElement();
         WebElement empresaElement = getCompanyElement();
@@ -191,7 +207,7 @@ public class ElempleoScraper {
         WebElement descripElement = getDescripElement();
         WebElement cargosElement = getPositionElement();
 
-        String  tituloOferta = tituloOfertaElement != null ? tituloOfertaElement.getText().trim() : "";
+        String tituloOferta = tituloOfertaElement != null ? tituloOfertaElement.getText().trim() : "";
         String empresa = empresaElement != null ? empresaElement.getText().trim() : "";
         String salario = salarioElement != null ? salarioElement.getText().trim() : "";
         String lugar = lugarElement != null ? lugarElement.getText().trim() : "";
@@ -217,7 +233,7 @@ public class ElempleoScraper {
         return false;
     }
 
-    private WebElement searchBtnInfoIcon (WebElement btnAperturaInformacion) {
+    private WebElement searchBtnInfoIcon(WebElement btnAperturaInformacion) {
         WebElement icono;
         try {
             icono = wait.until(ExpectedConditions.elementToBeClickable(btnAperturaInformacion.findElement(By.xpath(".//i[contains(@class, 'fa-eye')]"))));
@@ -228,7 +244,7 @@ public class ElempleoScraper {
         }
     }
 
-    private String changePageMaxView () {
+    private String changePageMaxView() {
         WebElement changePageContainer;
         WebElement numberOfMaxView;
         try {
@@ -243,7 +259,7 @@ public class ElempleoScraper {
         }
     }
 
-    private WebElement getTitleElement () {
+    private WebElement getTitleElement() {
         WebElement element;
         try {
             Thread.sleep(250);
@@ -255,7 +271,7 @@ public class ElempleoScraper {
         }
     }
 
-    private WebElement getCompanyElement () {
+    private WebElement getCompanyElement() {
         WebElement element;
         try {
             Thread.sleep(250);
@@ -267,7 +283,7 @@ public class ElempleoScraper {
         }
     }
 
-    private WebElement getSalaryElement () {
+    private WebElement getSalaryElement() {
         WebElement element;
         try {
             Thread.sleep(250);
@@ -279,7 +295,7 @@ public class ElempleoScraper {
         }
     }
 
-    private WebElement getCityElement () {
+    private WebElement getCityElement() {
         WebElement element;
         try {
             Thread.sleep(250);
@@ -291,7 +307,7 @@ public class ElempleoScraper {
         }
     }
 
-    private WebElement getDateElement () {
+    private WebElement getDateElement() {
         WebElement element;
         try {
             Thread.sleep(250);
@@ -303,7 +319,7 @@ public class ElempleoScraper {
         }
     }
 
-    private WebElement getDescripElement () {
+    private WebElement getDescripElement() {
         WebElement element;
         try {
             Thread.sleep(250);
@@ -315,7 +331,7 @@ public class ElempleoScraper {
         }
     }
 
-    private WebElement getPositionElement () {
+    private WebElement getPositionElement() {
         WebElement element;
         try {
             Thread.sleep(250);
@@ -327,7 +343,7 @@ public class ElempleoScraper {
         }
     }
 
-    private WebElement searchContenedorPadre () {
+    private WebElement searchContenedorPadre() {
         WebElement element;
         try {
             Thread.sleep(1000);
@@ -339,7 +355,7 @@ public class ElempleoScraper {
         }
     }
 
-    private int findOffersXPage () {
+    private int findOffersXPage() {
         WebElement cantMaxOfertasPag;
         try {
             cantMaxOfertasPag = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//span[@class='results-data js-results-data']//strong[@class='js-end-index']")));
@@ -351,7 +367,7 @@ public class ElempleoScraper {
         }
     }
 
-    private int findTotalOffers (){
+    private int findTotalOffers() {
         WebElement cantTotalOfertas;
         try {
             cantTotalOfertas = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//span[@class='results-data js-results-data']//strong[@class='js-total-results']")));
@@ -363,7 +379,7 @@ public class ElempleoScraper {
         }
     }
 
-    private void updateProgressBar (int currentPos, int maxPos) {
+    private void updateProgressBar(int currentPos, int maxPos) {
         Platform.runLater(() -> {
             double progress;
             if (currentPos <= maxPos) {
@@ -373,5 +389,9 @@ public class ElempleoScraper {
             }
             progressBar.setProgress(progress);
         });
+    }
+
+    public void cancelScraper() {
+        cancelScraping = true;
     }
 }

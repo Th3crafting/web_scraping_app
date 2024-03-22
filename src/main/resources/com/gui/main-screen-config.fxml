@@ -1,24 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ProgressBar?>
-<?import javafx.scene.control.RadioButton?>
-<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.*?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
-
 <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.gui.MainScreenController">
    <children>
-      <Button fx:id="buttonScrap" layoutX="264.0" layoutY="300.0" mnemonicParsing="false" onAction="#onScrapButtonClick" text="Transcribir" />
+      <Button fx:id="buttonScrap" contentDisplay="CENTER" layoutX="307.0" layoutY="300.0" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onScrapButtonClick" prefHeight="25.0" prefWidth="105.0" text="Transcribir">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor></Button>
+      <Button fx:id="buttonCancel" contentDisplay="CENTER" disable="true" layoutX="193.0" layoutY="300.0" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onCancelButtonClick" prefHeight="25.0" prefWidth="105.0" text="Cancelar">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
       <Label layoutX="30.0" layoutY="30.0" text="Inserte el url para realizar Scraping">
          <font>
             <Font name="Arial" size="13.0" />
          </font></Label>
-      <RadioButton fx:id="checkCompuTrabajo" layoutX="30.0" layoutY="100.0" mnemonicParsing="false" text="Computrabajo" />
-      <RadioButton fx:id="checkElEmpleo" layoutX="30.0" layoutY="120.0" mnemonicParsing="false" text="Elempleo" />
-      <RadioButton fx:id="checkLinkedIn" layoutX="30.0" layoutY="140.0" mnemonicParsing="false" text="LinkedIn" />
-      <RadioButton fx:id="checkTest" layoutX="10.0" layoutY="300.0" mnemonicParsing="false" text="Test" />
+      <RadioButton fx:id="checkCompuTrabajo" layoutX="30.0" layoutY="100.0" mnemonicParsing="false" text="Computrabajo">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor></RadioButton>
+      <RadioButton fx:id="checkElEmpleo" layoutX="30.0" layoutY="120.0" mnemonicParsing="false" text="Elempleo">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor></RadioButton>
+      <RadioButton fx:id="checkLinkedIn" layoutX="30.0" layoutY="140.0" mnemonicParsing="false" text="LinkedIn">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor></RadioButton>
+      <RadioButton fx:id="checkTest" layoutX="10.0" layoutY="271.0" mnemonicParsing="false" text="Test">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor></RadioButton>
       <Label fx:id="txtStatus" layoutX="193.0" layoutY="240.0" />
       <ProgressBar fx:id="progressBar" layoutX="193.0" layoutY="271.0" prefHeight="20.0" prefWidth="220.0" progress="0.0" />
       <TextField fx:id="txtUrlPagina" layoutX="30.0" layoutY="50.0" />
